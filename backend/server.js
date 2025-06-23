@@ -17,32 +17,42 @@ import settingsRouter from './routes/settingsRoutes.js';
 const app = express();
 const port = process.env.PORT || 4000;
 
+// Parse CORS_ORIGIN env string into array, trimming any accidental whitespace
+const allowedOrigins = process.env.CORS_ORIGIN?.split(',').map(origin => origin.trim()) || [];
+
 connectDB();
 connectCloudinary();
-connectRedis(); // Redis starts once on server start
+connectRedis();
+
+// Debug log to inspect incoming origin
+app.use((req, res, next) => {
+  console.log('Incoming Origin:', req.headers.origin);
+  next();
+});
 
 // Middleware
 app.use(express.json());
+
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin like mobile apps or curl
-    if (!origin) return callback(null, true);
+    if (!origin) return callback(null, true); // Allow requests like curl/postman
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     } else {
+      console.error(`CORS BLOCKED: ${origin}`);
       return callback(new Error(`CORS policy: No access from origin ${origin}`), false);
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "token"],
   credentials: true,
-  preflightContinue: false,
-  optionsSuccessStatus: 204
+  optionsSuccessStatus: 204,
 }));
-// Handle preflight requests
+
+// Handle preflight
 app.options('*', cors());
 
-// app.use(cors());
+// Cookie parser
 app.use(cookieParser());
 
 // Routes
@@ -51,7 +61,7 @@ app.use('/api/product', productRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/order', orderRouter);
 app.use('/api/admin', adminRouter);
-app.use("/api/admin", settingsRouter);
+app.use('/api/admin', settingsRouter);
 
 app.get('/', (req, res) => {
   res.send('API Working');
