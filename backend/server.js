@@ -24,14 +24,21 @@ connectRedis(); // Redis starts once on server start
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"], // Add all your frontend origins
+  origin: (origin, callback) => {
+    // Allow requests with no origin like mobile apps or curl
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error(`CORS policy: No access from origin ${origin}`), false);
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "token"],
   credentials: true,
   preflightContinue: false,
   optionsSuccessStatus: 204
 }));
-
 // Handle preflight requests
 app.options('*', cors());
 
