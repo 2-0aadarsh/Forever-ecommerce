@@ -61,9 +61,13 @@ const ShopContextProvider = (props) => {
     if (token) {
       try {
         await axios.post(
-          backendUrl + "/api/cart/add",
+          `${backendUrl}/api/cart/add`,
           { itemId, size },
-          { headers: { token } }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
       } catch (error) {
         console.log(error);
@@ -94,9 +98,13 @@ const ShopContextProvider = (props) => {
     if (token) {
       try {
         await axios.post(
-          backendUrl + "/api/cart/update",
+          `${backendUrl}/api/cart/update`,
           { itemId, size, quantity },
-          { headers: { token } }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
       } catch (error) {
         console.log(error);
@@ -122,7 +130,7 @@ const ShopContextProvider = (props) => {
 
   const getProductsData = async () => {
     try {
-      const response = await axios.get(backendUrl + "/api/product/list");
+      const response = await axios.get(`${backendUrl}/api/product/list`);
       if (response.data.success) {
         setProducts(response.data.products.reverse());
       } else {
@@ -137,8 +145,10 @@ const ShopContextProvider = (props) => {
   const getUserCart = async (token) => {
     try {
       setCartLoading(true);
-      const response = await axios.get(backendUrl + "/api/cart/get", {
-        headers: { token },
+      const response = await axios.get(`${backendUrl}/api/cart/get`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       if (response.data.success) {
         const merged = mergeCarts(cartItems, response.data.cartData);
@@ -155,9 +165,14 @@ const ShopContextProvider = (props) => {
 
   const getUserProfile = async (token) => {
     try {
-      const response = await axios.get(backendUrl + "/api/user/profile", {
-        headers: { token },
+      const response = await axios.get(`${backendUrl}/api/user/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+
+      console.log("response user : ", response)
+
       if (response.data.success) {
         setUserData(response.data.user);
       } else {
@@ -173,7 +188,6 @@ const ShopContextProvider = (props) => {
     getProductsData();
   }, []);
 
-  // Load token from localStorage once on initial load
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
@@ -181,7 +195,6 @@ const ShopContextProvider = (props) => {
     }
   }, []);
 
-  // When token is set, fetch user profile and cart
   useEffect(() => {
     if (token) {
       getUserCart(token);
@@ -210,6 +223,7 @@ const ShopContextProvider = (props) => {
     userData,
     cartLoading,
     cartError,
+    getUserProfile, // Exposed for use in Verify.jsx
   };
 
   return (

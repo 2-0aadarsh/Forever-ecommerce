@@ -1,32 +1,12 @@
-// // redisClient.js
-// import { createClient } from 'redis';
-
-// const redisClient = createClient({
-//   username: 'default',
-//   password: 'jvGhRBAAmvIi5s75hIVvPk3gfVe9UwtK',
-//   socket: {
-//     host: 'redis-17262.crce179.ap-south-1-1.ec2.redns.redis-cloud.com',
-//     port: 17262,
-//   },
-// });
-
-// redisClient.on('error', (err) => {
-//   console.error('❌ Redis Client Error:', err);
-// });
-
-// redisClient.on('connect', () => {
-//   console.log('✅ Connected to Redis successfully!');
-// });
-
-// export default redisClient;
-
-
 import Redis from 'ioredis';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const redis = new Redis({
-  password: 'jvGhRBAAmvIi5s75hIVvPk3gfVe9UwtK',
-  host: 'redis-17262.crce179.ap-south-1-1.ec2.redns.redis-cloud.com',
-  port: 17262,
+  password: process.env.REDIS_PASSWORD,
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT,
 });
 
 redis.on('error', (err) => {
@@ -39,7 +19,7 @@ const connectRedis = async () => {
   try {
     await redis.ping(); // Ping Redis to ensure the connection is working
   } catch (error) {
-    console.error('❌ Redis connection failed:', error);
+    console.error('Redis connection failed:', error);
   }
 };
 

@@ -1,3 +1,4 @@
+// src/App.jsx
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Collection from "./pages/Collection";
@@ -16,8 +17,11 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Verify from "./pages/Verify";
 import Profile from "./pages/Profile";
+import ProtectedRoute from "./components/ProtectedRoute";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
-const App = () => {
+const App = () => { 
   return (
     <ScrollToTop>
       <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
@@ -33,10 +37,32 @@ const App = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Login />} />
           <Route path="/verify" element={<Verify />} />
-          <Route path="/place-order" element={<PlaceOrder />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/verify" element={<Verify />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route
+            path="/place-order"
+            element={
+              <ProtectedRoute>
+                <PlaceOrder />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <Orders />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
         <Footer />
       </div>
